@@ -89,6 +89,11 @@ class Player:
             else:
                 break
 
+        # If the input does not have a frame, give it the same frame number as
+        # the previous action
+        if frame_str == "":
+            frame_str = action_list[-1].frame_num
+
         while True:
             if replay_line[start + counter] != 'y':
                 input_str = input_str + replay_line[start + counter]
