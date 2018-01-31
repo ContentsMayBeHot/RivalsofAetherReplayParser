@@ -7,6 +7,21 @@
 import sys
 from enum import Enum
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+    return False
+
 def parser(filename):
 
     f = open(filename, "r")
@@ -28,7 +43,7 @@ def parser(filename):
 class Replay:
     def __init__(self):
         self.players = []
-        
+
 
 # The Player class is a wrapper for our player file, it contains the raw
 # information that we pull from the replay file as information that we can
@@ -37,7 +52,7 @@ class Player:
     def __init__(self, p_info, p_replay):
         self.name = self.getName(p_info)
         self.character = self.getCharacter(p_info)
-        #self.actions = self.getActions(p_replay)
+        self.actions = self.getActions(p_replay)
 
     def getName(self, info_line):
         name = info_line[1:33]
@@ -53,6 +68,53 @@ class Player:
         return enum
 
     def getActions(self, replay_line):
+        actions = []
+        i = 0
+
+        #self.getSingleAction(0, replay_line, actions)
+        #print("action_frame", actions[0].frame_num, "action id", actions[0].input_id)
+
+        while i < len(replay_line):
+            i += self.getSingleAction(i, replay_line, actions)
+
+    def getSingleAction(self, start, replay_line, action_list):
+        counter = 0;
+        frame_str = ""
+        input_str = ""
+
+        while True:
+            if is_number(replay_line[start + counter]):
+                frame_str = frame_str + replay_line[start + counter]
+                counter += 1
+            else:
+                break
+
+        while True:
+            if replay_line[start + counter] != 'y':
+                input_str = input_str + replay_line[start + counter]
+                break
+            else:
+                input_str = input_str + replay_line[start + counter]
+                counter += 1
+                input_str = input_str + replay_line[start + counter]
+                counter += 1
+                input_str = input_str + replay_line[start + counter]
+                counter += 1
+                input_str = input_str + replay_line[start + counter]
+                break
+
+        print("action_frame", frame_str, "action id", input_str)
+        action_list.append(Action(frame_str, input_str))
+
+        counter += 1
+        return counter
+
+
+
+class Action:
+    def __init__(self, frame_num, input_id):
+        self.frame_num = frame_num
+        self.input_id = input_id
 
 
 
@@ -75,6 +137,8 @@ if __name__ == "__main__":
     if(len(sys.argv) < 2):
         print ("You must include a file.")
     elif(len(sys.argv) > 2):
-        print("At this time, we can only accept one file.")
+        for i, arg in enumerate(sys.argv):
+            if(i != 0):
+                parser(arg)
     else:
         parser(sys.argv[1])
