@@ -25,6 +25,10 @@ def parser(filename):
             if(line[0] == 'H'):
                 players.append(Player(line, lines[i + 1]))
 
+class Replay:
+    def __init__(self):
+        self.players = []
+        
 
 # The Player class is a wrapper for our player file, it contains the raw
 # information that we pull from the replay file as information that we can
@@ -45,11 +49,11 @@ class Player:
         character_id = info_line[39:41]
         print("character_id:", character_id)
         enum = Character(int(character_id))
-        print("numized", enum, enum.value)
-
+        print("enumized", enum, enum.value)
         return enum
 
-    def getActions(self, replay_line)
+    def getActions(self, replay_line):
+
 
 
 class Character(Enum):
