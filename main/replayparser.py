@@ -108,7 +108,7 @@ class Player:
                 input_str = input_str + replay_line[start + counter]
                 break
 
-        print("action_frame", frame_str, "action id", input_str)
+        print("action_frame", frame_str, "actionid", input_str)
         action_list.append(Action(frame_str, input_str))
 
         counter += 1
