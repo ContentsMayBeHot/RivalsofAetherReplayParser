@@ -7,21 +7,6 @@
 import sys
 from enum import Enum
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-    return False
-
 def Parser(filename):
 
     f = open(filename, "r")
@@ -83,8 +68,9 @@ class Player:
         input_str = ""
 
         while True:
-            if is_number(replay_line[start + counter]):
-                frame_str = frame_str + replay_line[start + counter]
+            ch = replay_line[start + counter]
+            if ch.isdigit():
+                frame_str = frame_str + ch
                 counter += 1
             else:
                 break
