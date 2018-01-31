@@ -1,4 +1,4 @@
-# replayparser.py by Rei Armenia(lazerzes)
+# replayParser.py by Rei Armenia(lazerzes)
 #
 # This function set takes in a .roa replay file and extracts the information
 # that the user may find useful.
@@ -22,7 +22,7 @@ def is_number(s):
         pass
     return False
 
-def parser(filename):
+def Parser(filename):
 
     f = open(filename, "r")
     print ("file.name:", f.name)
@@ -144,6 +144,6 @@ if __name__ == "__main__":
     elif(len(sys.argv) > 2):
         for i, arg in enumerate(sys.argv):
             if(i != 0):
-                parser(arg)
+                Parser(arg)
     else:
-        parser(sys.argv[1])
+        Parser(sys.argv[1])
