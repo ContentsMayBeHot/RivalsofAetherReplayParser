@@ -5,6 +5,7 @@
 
 
 import sys
+from enum import Enum
 
 def parser(filename):
 
@@ -24,22 +25,47 @@ def parser(filename):
             if(line[0] == 'H'):
                 players.append(Player(line, lines[i + 1]))
 
-    for n, player in enumerate(players):
-        print("Player", n, "information:")
-        print("info", '\n', player.p_info)
-        print("~~~~~~~~~~~")
-        print("replay", '\n', player.p_replay)
-        print("-----------------------------------------------------------")
-
 
 # The Player class is a wrapper for our player file, it contains the raw
 # information that we pull from the replay file as information that we can
 # easily work with in python.
 class Player:
     def __init__(self, p_info, p_replay):
-        self.p_info = p_info
-        self.p_replay = p_replay
+        self.name = self.getName(p_info)
+        self.character = self.getCharacter(p_info)
+        #self.actions = self.getActions(p_replay)
 
+    def getName(self, info_line):
+        name = info_line[1:33]
+        name = name.rstrip()
+        print ("name:", name)
+        return name
+
+    def getCharacter(self, info_line):
+        character_id = info_line[39:41]
+        print("character_id:", character_id)
+        enum = Character(int(character_id))
+        print("numized", enum, enum.value)
+
+        return enum
+
+    def getActions(self, replay_line)
+
+
+class Character(Enum):
+    NONE = 0
+    INVALID = 1
+    ZETTERBURN = 2
+    ORCANE = 3
+    WRASTOR = 4
+    KRAGG = 5
+    FORSBURN = 6
+    MAYPUL = 7
+    ABSA = 8
+    ETALUS = 9
+    ORI = 10
+    RANNO = 11
+    CLAIREN = 12
 
 if __name__ == "__main__":
     if(len(sys.argv) < 2):
