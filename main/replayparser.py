@@ -70,7 +70,7 @@ class Player:
         while True:
             token = replay_line[lower_bound + position]
             if token.isdigit():
-                frame_str = frame_str + token
+                frame_str += token
                 position += 1
             else:
                 break
@@ -85,29 +85,29 @@ class Player:
             if token != 'y':
                 input_str = input_str + token
                 break
-            degrees = replay_line[lower_bound+position+1 : lower_bound+position+3]
+            degrees = replay_line[lower_bound+position+1:lower_bound+position+3]
             input_str += token + degrees
             position += 3
 
+        # Compute milliseconds from frame
         frame_index = float(frame_str)
         ms = (frame_index / 60.0) * 1000.0
 
+        # Print in tsv format
+        print("ms {0:.2f}".format(ms),
+              "\taction_frame", frame_str,
+              "\tactionid", input_str)
 
-        print("ms {0:.2f}\t".format(ms),
-              "action_frame", frame_str, "\t",
-              "actionid", input_str)
         action_list.append(Action(frame_str, input_str))
 
         position += 1
         return position
 
 
-
 class Action:
     def __init__(self, frame_num, input_id):
         self.frame_num = frame_num
         self.input_id = input_id
-
 
 
 class Character(Enum):
