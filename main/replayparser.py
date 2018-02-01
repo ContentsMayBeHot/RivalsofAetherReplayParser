@@ -1,4 +1,4 @@
-# replayParser.py by Rei Armenia(lazerzes)
+# replayparser.py by Rei Armenia(lazerzes)
 #
 # This function set takes in a .roa replay file and extracts the information
 # that the user may find useful.
@@ -7,7 +7,7 @@
 import sys
 from enum import Enum
 
-def Parser(filename):
+def parser(filename):
 
     f = open(filename, "r")
     print ("file.name:", f.name)
@@ -125,6 +125,6 @@ if __name__ == "__main__":
     elif(len(sys.argv) > 2):
         for i, arg in enumerate(sys.argv):
             if(i != 0):
-                Parser(arg)
+                parser(arg)
     else:
-        Parser(sys.argv[1])
+        parser(sys.argv[1])
