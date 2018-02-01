@@ -62,16 +62,16 @@ class Player:
         while i < len(replay_line):
             i += self.getSingleAction(i, replay_line, actions)
 
-    def getSingleAction(self, start, replay_line, action_list):
-        counter = 0;
+    def getSingleAction(self, lower_bound, replay_line, action_list):
+        position = 0;
         frame_str = ""
         input_str = ""
 
         while True:
-            token = replay_line[start + counter]
+            token = replay_line[lower_bound + position]
             if token.isdigit():
                 frame_str = frame_str + token
-                counter += 1
+                position += 1
             else:
                 break
 
@@ -81,20 +81,19 @@ class Player:
             frame_str = action_list[-1].frame_num
 
         while True:
-            token = replay_line[start + counter]
+            token = replay_line[lower_bound + position]
             if token != 'y':
                 input_str = input_str + token
                 break
-            else:
-                degrees = replay_line[start+counter+1:start+counter+4]
-                input_str += token + degrees
-                counter += 3
+            degrees = replay_line[lower_bound+position+1 : lower_bound+position+3]
+            input_str += token + degrees
+            position += 3
 
         print("action_frame", frame_str, "actionid", input_str)
         action_list.append(Action(frame_str, input_str))
 
-        counter += 1
-        return counter
+        position += 1
+        return position
 
 
 
