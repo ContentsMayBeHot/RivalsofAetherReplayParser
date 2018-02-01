@@ -89,7 +89,13 @@ class Player:
             input_str += token + degrees
             position += 3
 
-        print("action_frame", frame_str, "actionid", input_str)
+        frame_index = float(frame_str)
+        ms = (frame_index / 60.0) * 1000.0
+
+
+        print("ms {0:.2f}\t".format(ms),
+              "action_frame", frame_str, "\t",
+              "actionid", input_str)
         action_list.append(Action(frame_str, input_str))
 
         position += 1
