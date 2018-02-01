@@ -7,21 +7,6 @@
 import sys
 from enum import Enum
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-    return False
-
 def parser(filename):
 
     f = open(filename, "r")
@@ -77,15 +62,16 @@ class Player:
         while i < len(replay_line):
             i += self.getSingleAction(i, replay_line, actions)
 
-    def getSingleAction(self, start, replay_line, action_list):
-        counter = 0;
+    def getSingleAction(self, lower_bound, replay_line, action_list):
+        position = 0;
         frame_str = ""
         input_str = ""
 
         while True:
-            if is_number(replay_line[start + counter]):
-                frame_str = frame_str + replay_line[start + counter]
-                counter += 1
+            token = replay_line[lower_bound + position]
+            if token.isdigit():
+                frame_str += token
+                position += 1
             else:
                 break
 
@@ -95,32 +81,33 @@ class Player:
             frame_str = action_list[-1].frame_num
 
         while True:
-            if replay_line[start + counter] != 'y':
-                input_str = input_str + replay_line[start + counter]
+            token = replay_line[lower_bound + position]
+            if token != 'y':
+                input_str = input_str + token
                 break
-            else:
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                break
+            degrees = replay_line[lower_bound+position+1:lower_bound+position+3]
+            input_str += token + degrees
+            position += 3
 
-        print("action_frame", frame_str, "actionid", input_str)
+        # Compute milliseconds from frame
+        frame_index = float(frame_str)
+        ms = (frame_index / 60.0) * 1000.0
+
+        # Print in tsv format
+        print("ms {0:.2f}".format(ms),
+              "\taction_frame", frame_str,
+              "\tactionid", input_str)
+
         action_list.append(Action(frame_str, input_str))
 
-        counter += 1
-        return counter
-
+        position += 1
+        return position
 
 
 class Action:
     def __init__(self, frame_num, input_id):
         self.frame_num = frame_num
         self.input_id = input_id
-
 
 
 class Character(Enum):
