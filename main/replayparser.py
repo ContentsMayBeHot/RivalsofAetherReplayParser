@@ -68,9 +68,9 @@ class Player:
         input_str = ""
 
         while True:
-            ch = replay_line[start + counter]
-            if ch.isdigit():
-                frame_str = frame_str + ch
+            token = replay_line[start + counter]
+            if token.isdigit():
+                frame_str = frame_str + token
                 counter += 1
             else:
                 break
@@ -81,18 +81,14 @@ class Player:
             frame_str = action_list[-1].frame_num
 
         while True:
-            if replay_line[start + counter] != 'y':
-                input_str = input_str + replay_line[start + counter]
+            token = replay_line[start + counter]
+            if token != 'y':
+                input_str = input_str + token
                 break
             else:
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                break
+                degrees = replay_line[start+counter+1:start+counter+4]
+                input_str += token + degrees
+                counter += 3
 
         print("action_frame", frame_str, "actionid", input_str)
         action_list.append(Action(frame_str, input_str))
