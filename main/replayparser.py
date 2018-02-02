@@ -7,42 +7,41 @@
 import sys
 from enum import Enum
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
+def parse_wrapper(file_name):
+    return Replay(file_name)
 
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-    return False
-
-def parser(filename):
-
-    f = open(filename, "r")
-    print ("file.name:", f.name)
-
-    lines = f.readlines()
-    players = []
-
-    # Even lines contain player information, except for line 0 which contains
-    # replay information, if an even line starts with the letter H then it is
-    # a human player, and has an input replay that we can use.
-    # This section of code detects if a line starts with H, if so then it takes
-    # that line and the next line and puts it into a list of player objects
-    for i, line in enumerate(lines):
-        if (i % 2 == 0 and i != 0):
-            if(line[0] == 'H'):
-                players.append(Player(line, lines[i + 1]))
 
 class Replay:
-    def __init__(self):
+    def __init__(self, file_name):
+        f = open(file_name, "r")
+        lines = f.readlines()
+        self.file_name = f.name
+        self.meta = self.get_meta(lines[0])
+        self.rules = self.get_rules(lines[1])
         self.players = []
+        self.get_players(lines[2:])
+
+    def get_meta(self, meta_line):
+        return meta_line
+
+    def get_rules(self, rules_line):
+        return rules_line
+
+    def get_players(self, player_lines):
+        for i, line in enumerate(player_lines):
+            if (i % 2 == 0):
+                if(line[0] == 'H'):
+                    self.players.append(Player(line, player_lines[i + 1]))
+
+    def print_replay(self):
+        print("Replay Name:", self.file_name)
+        print("----------------------------")
+        for i, player in enumerate(self.players):
+            print("Player " + str(i+1) + ": ", player.name)
+            print("Character:", player.character)
+            print("----------------------------")
+            for action in player.actions:
+                print ("On Frame #:", action.frame_num, "action " + action.input_id + " took place")
 
 
 # The Player class is a wrapper for our player file, it contains the raw
@@ -50,76 +49,74 @@ class Replay:
 # easily work with in python.
 class Player:
     def __init__(self, p_info, p_replay):
-        self.name = self.getName(p_info)
-        self.character = self.getCharacter(p_info)
-        self.actions = self.getActions(p_replay)
+        self.name = self.get_name(p_info)
+        self.character = self.get_character(p_info)
+        self.actions = []
+        self.get_actions(p_replay)
 
-    def getName(self, info_line):
+    def get_name(self, info_line):
         name = info_line[1:33]
         name = name.rstrip()
-        print ("name:", name)
         return name
 
-    def getCharacter(self, info_line):
+    def get_character(self, info_line):
         character_id = info_line[39:41]
-        print("character_id:", character_id)
         enum = Character(int(character_id))
-        print("enumized", enum, enum.value)
         return enum
 
-    def getActions(self, replay_line):
-        actions = []
+    def get_actions(self, replay_line):
         i = 0
-
         #self.getSingleAction(0, replay_line, actions)
         #print("action_frame", actions[0].frame_num, "action id", actions[0].input_id)
-
         while i < len(replay_line):
-            i += self.getSingleAction(i, replay_line, actions)
+            i += self.get_single_action(i, replay_line)
 
-    def getSingleAction(self, start, replay_line, action_list):
-        counter = 0;
+    def get_single_action(self, lower_bound, replay_line):
+        position = 0
         frame_str = ""
         input_str = ""
 
         while True:
-            if is_number(replay_line[start + counter]):
-                frame_str = frame_str + replay_line[start + counter]
-                counter += 1
+            if replay_line[lower_bound + position].isdigit():
+                frame_str = frame_str + replay_line[lower_bound + position]
+                position += 1
             else:
                 break
 
         # If the input does not have a frame, give it the same frame number as
         # the previous action
         if frame_str == "":
-            frame_str = action_list[-1].frame_num
+            frame_str = self.actions[-1].frame_num
 
         while True:
-            if replay_line[start + counter] != 'y':
-                input_str = input_str + replay_line[start + counter]
+            if replay_line[lower_bound + position] != 'y':
+                input_str = input_str + replay_line[lower_bound + position]
                 break
             else:
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
-                counter += 1
-                input_str = input_str + replay_line[start + counter]
+                input_str = input_str + replay_line[lower_bound + position : lower_bound + position + 4]
+                position += 3
                 break
 
-        print("action_frame", frame_str, "actionid", input_str)
-        action_list.append(Action(frame_str, input_str))
+        # This line is here to remove any invaid actions
+        # We do this because sometimes there are spaces at the end of a line
+        if(len(input_str.rstrip()) > 0):
+            self.actions.append(Action(frame_str, input_str))
 
-        counter += 1
-        return counter
+        position += 1
+        return position
 
 
 
 class Action:
-    def __init__(self, frame_num, input_id):
-        self.frame_num = frame_num
+    def __init__(self, frame_str, input_id):
+        self.frame_num = int(frame_str)
         self.input_id = input_id
+
+    def get_ms_from_start(self):
+        return (self.frame_num / 60.00) * 1000
+
+    def get_ms_delta(self, action):
+        return ((self.frame_num / 60.00) * 1000) - ((action.frame_num / 60.00) * 1000)
 
 
 
@@ -139,11 +136,16 @@ class Character(Enum):
     CLAIREN = 12
 
 if __name__ == "__main__":
+    replays = []
+
     if(len(sys.argv) < 2):
         print ("You must include a file.")
     elif(len(sys.argv) > 2):
         for i, arg in enumerate(sys.argv):
             if(i != 0):
-                parser(arg)
+                replays.append(parse_wrapper(arg))
     else:
-        parser(sys.argv[1])
+        replays.append(parse_wrapper(sys.argv[1]))
+
+    for replay in replays:
+        replay.print_replay()
