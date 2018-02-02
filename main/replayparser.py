@@ -6,6 +6,7 @@
 
 import sys
 from enum import Enum
+import time
 
 def parse_wrapper(file_name):
     return Replay(file_name)
@@ -137,15 +138,24 @@ class Character(Enum):
 
 if __name__ == "__main__":
     replays = []
+    parse_time = 0
 
     if(len(sys.argv) < 2):
         print ("You must include a file.")
     elif(len(sys.argv) > 2):
         for i, arg in enumerate(sys.argv):
             if(i != 0):
+                before = time.time()
                 replays.append(parse_wrapper(arg))
+                after = time.time()
+                parse_time += (after - before)
     else:
+        before = time.time()
         replays.append(parse_wrapper(sys.argv[1]))
+        after = time.time()
+        parse_time += (after - before)
 
     for replay in replays:
         replay.print_replay()
+
+    print("Parsed", (len(sys.argv) - 1), "Replays in", (parse_time * 1000), "ms")
