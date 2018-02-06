@@ -52,13 +52,13 @@ class Replay:
         f = open(file_name, "w+")
 
         f.write(self.meta + "\n")
-        f.write(str(self.stage_id) + "\t" + str(self.stage_type))
+        f.write(str(self.stage_id) + "\t" + str(self.stage_type) + "\n")
 
         for i, player in enumerate(self.players):
             f.write(str(i + 1) + "\t" + player.name + "\t" + str(player.character) + "\n")
             f.write("\n")
             for action in player.actions:
-                f.write(str(action.frame_index) + "\t" + action.input_id + "\n")
+                f.write(str(action.frame_index) + "\t" + action.input_id + "\t" + str(action.type) + "\n")
 
             f.write("\n")
 
