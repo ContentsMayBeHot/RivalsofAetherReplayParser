@@ -42,7 +42,7 @@ class Replay:
             print("Character:", player.character)
             print("----------------------------")
             for action in player.actions:
-                print ("On Frame #:", action.frame_num, "action " + action.input_id + " took place")
+                print ("On Frame #:", action.frame_num, "action " + action.input_id + " took place", action.action)
 
     def to_file(self):
         file_name = self.file_name[:-4]
@@ -126,17 +126,134 @@ class Player:
         return position
 
 
-
 class Action:
     def __init__(self, frame_str, input_id):
         self.frame_num = int(frame_str)
         self.input_id = input_id
+        self.action = self.cast_action()
+
+    def cast_action(self):
+        simp_action = 0
+        if(self.input_id[0] in ['y', 'Y']):
+            simp_action = 45 * round(float(self.input_id[1:]) / 45)
+            if(simp_action == 360):
+                simp_action = 0
+        else:
+            simp_action = self.input_id[0]
+
+        return self.map_actions(simp_action)
+
+
+    def map_actions(self, x):
+        return{
+            'L' : ActionType.LEFT_PRESS,
+            'l' : ActionType.LEFT_RELEASE,
+            'E' : ActionType.LEFT_TAP,
+            'R' : ActionType.RIGHT_PRESS,
+            'r' : ActionType.RIGHT_RELEASE,
+            'I' : ActionType.RIGHT_TAP,
+            'U' : ActionType.UP_PRESS,
+            'u' : ActionType.UP_RELEASE,
+            'M' : ActionType.UP_TAP,
+            'D' : ActionType.DOWN_PRESS,
+            'd' : ActionType.DOWN_RELEASE,
+            'O' : ActionType.DOWN_TAP,
+            'A' : ActionType.ATTACK_PRESS,
+            'a' : ActionType.ATTACK_RELEASE,
+            'B' : ActionType.SPECIAL_PRESS,
+            'b' : ActionType.SPECIAL_RELEASE,
+            'J' : ActionType.JUMP_PRESS,
+            'j' : ActionType.JUMP_RELEASE,
+            'S' : ActionType.DODGE_PRESS,
+            's' : ActionType.DODGE_RELEASE,
+            'C' : ActionType.STRONG_PRESS,
+            'c' : ActionType.STRONG_RELEASE,
+            'F' : ActionType.STRONG_LEFT_PRESS,
+            'f' : ActionType.STRONG_LEFT_RELEASE,
+            'G' : ActionType.STRONG_RIGHT_PRESS,
+            'g' : ActionType.STRONG_RIGHT_RELEASE,
+            'X' : ActionType.STRONG_UP_PRESS,
+            'x' : ActionType.STRONG_UP_RELEASE,
+            'W' : ActionType.STRONG_DOWN_PRESS,
+            'w' : ActionType.STRONG_DOWN_RELEASE,
+            0 : ActionType.ANG_RIGHT,
+            45 : ActionType.ANG_UP_RIGHT,
+            90 : ActionType.ANG_UP,
+            135 : ActionType.ANG_UP_LEFT,
+            180 : ActionType.ANG_LEFT,
+            225 : ActionType.ANG_DOWN_LEFT,
+            270 : ActionType.ANG_DOWN,
+            315 : ActionType.ANG_DOWN_RIGHT,
+            'Z' : ActionType.ANG_TOGGLE_PRESS,
+            'z' : ActionType.ANG_TOGGLE_RELEASE
+        }.get(x, ActionType.INVALID)
+
 
     def get_ms_from_start(self):
         return (self.frame_num / 60.00) * 1000
 
     def get_ms_delta(self, action):
         return ((self.frame_num / 60.00) * 1000) - ((action.frame_num / 60.00) * 1000)
+
+class ActionType(Enum):
+    INVALID = -1
+
+    LEFT_PRESS = 0
+    LEFT_RELEASE = 1
+    LEFT_TAP = 2
+
+    RIGHT_PRESS = 3
+    RIGHT_RELEASE = 4
+    RIGHT_TAP = 5
+
+    UP_PRESS = 6
+    UP_RELEASE = 7
+    UP_TAP = 8
+
+    DOWN_PRESS = 9
+    DOWN_RELEASE = 10
+    DOWN_TAP = 11
+
+    ATTACK_PRESS = 12
+    ATTACK_RELEASE = 13
+
+    SPECIAL_PRESS = 14
+    SPECIAL_RELEASE = 15
+
+    JUMP_PRESS = 16
+    JUMP_RELEASE = 17
+
+    DODGE_PRESS = 18
+    DODGE_RELEASE = 19
+
+    STRONG_PRESS = 20
+    STRONG_RELEASE = 21
+
+    STRONG_LEFT_PRESS = 22
+    STRONG_LEFT_RELEASE = 23
+
+    STRONG_RIGHT_PRESS = 24
+    STRONG_RIGHT_RELEASE = 25
+
+    STRONG_UP_PRESS = 26
+    STRONG_UP_RELEASE = 27
+
+    STRONG_DOWN_PRESS = 28
+    STRONG_DOWN_RELEASE = 29
+
+    ANG_RIGHT = 30
+    ANG_UP_RIGHT = 31
+    ANG_UP = 32
+    ANG_UP_LEFT = 33
+    ANG_LEFT = 34
+    ANG_DOWN_LEFT = 35
+    ANG_DOWN = 36
+    ANG_DOWN_RIGHT = 37
+
+    ANG_TOGGLE_PRESS = 38
+    ANG_TOGGLE_RELEASE = 39
+
+
 
 
 
