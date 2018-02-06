@@ -18,15 +18,15 @@ class Replay:
         lines = f.readlines()
         self.file_name = f.name
         self.meta = self.get_meta(lines[0])
-        self.rules = self.get_rules(lines[1])
+        self.stage_type, self.stage_id = self.get_stage(lines[1])
         self.players = []
         self.get_players(lines[2:])
 
     def get_meta(self, meta_line):
         return meta_line
 
-    def get_rules(self, rules_line):
-        return rules_line
+    def get_stage(self, line):
+        return StageType(int(line[0])), Stage(int(line[1:3]))
 
     def get_players(self, player_lines):
         for i, line in enumerate(player_lines):
@@ -36,13 +36,14 @@ class Replay:
 
     def print_replay(self):
         print("Replay Name:", self.file_name)
+        print("Stage: ", self.stage_id, self.stage_type)
         print("----------------------------")
         for i, player in enumerate(self.players):
             print("Player " + str(i+1) + ": ", player.name)
             print("Character:", player.character)
             print("----------------------------")
             for action in player.actions:
-                print ("On Frame #:", action.frame_num, "action " + action.input_id + " took place", action.action)
+                print ("On Frame #:", action.frame_index, "action " + action.input_id + " took place", action.type)
 
     def to_file(self):
         file_name = self.file_name[:-4]
@@ -51,13 +52,13 @@ class Replay:
         f = open(file_name, "w+")
 
         f.write(self.meta + "\n")
-        f.write(self.rules + "\n")
+        f.write(str(self.stage_id) + "\t" + str(self.stage_type))
 
         for i, player in enumerate(self.players):
             f.write(str(i + 1) + "\t" + player.name + "\t" + str(player.character) + "\n")
             f.write("\n")
             for action in player.actions:
-                f.write(str(action.frame_num) + "\t" + action.input_id + "\n")
+                f.write(str(action.frame_index) + "\t" + action.input_id + "\n")
 
             f.write("\n")
 
@@ -87,7 +88,7 @@ class Player:
     def get_actions(self, replay_line):
         i = 0
         #self.getSingleAction(0, replay_line, actions)
-        #print("action_frame", actions[0].frame_num, "action id", actions[0].input_id)
+        #print("action_frame", actions[0].frame_index, "action id", actions[0].input_id)
         while i < len(replay_line):
             i += self.get_single_action(i, replay_line)
 
@@ -106,7 +107,7 @@ class Player:
         # If the input does not have a frame, give it the same frame number as
         # the previous action
         if frame_str == "":
-            frame_str = self.actions[-1].frame_num
+            frame_str = self.actions[-1].frame_index
 
         while True:
             if replay_line[lower_bound + position] != 'y':
@@ -128,9 +129,9 @@ class Player:
 
 class Action:
     def __init__(self, frame_str, input_id):
-        self.frame_num = int(frame_str)
+        self.frame_index = int(frame_str)
         self.input_id = input_id
-        self.action = self.cast_action()
+        self.type = self.cast_action()
 
     def cast_action(self):
         simp_action = 0
@@ -190,10 +191,10 @@ class Action:
 
 
     def get_ms_from_start(self):
-        return (self.frame_num / 60.00) * 1000
+        return (self.frame_index / 60.00) * 1000
 
     def get_ms_delta(self, action):
-        return ((self.frame_num / 60.00) * 1000) - ((action.frame_num / 60.00) * 1000)
+        return ((self.frame_index / 60.00) * 1000) - ((action.frame_index / 60.00) * 1000)
 
 class ActionType(Enum):
     INVALID = -1
@@ -253,9 +254,22 @@ class ActionType(Enum):
     ANG_TOGGLE_PRESS = 38
     ANG_TOGGLE_RELEASE = 39
 
+class StageType(Enum):
+    INVALID = -1
+    BASIC = 0
+    AETHER = 1
 
-
-
+class Stage(Enum):
+    INVALID = -1
+    NOTHING = 0
+    TREETOP_LODGE = 1
+    FIRE_CAPITOL = 2
+    AIR_ARMADA = 3
+    ROCK_WALL = 4
+    MERCHANT_PORT = 5
+    ALSO_NOTHING = 6
+    BLAZING_HIDEOUT = 7
+    TOWER_HEAVEN = 8
 
 class Character(Enum):
     NONE = 0
