@@ -44,9 +44,28 @@ class Replay:
             for action in player.actions:
                 print ("On Frame #:", action.frame_num, "action " + action.input_id + " took place")
 
+    def to_file(self):
+        file_name = self.file_name[:-4]
+        file_name += "_parsed.txt"
+
+        f = open(file_name, "w+")
+
+        f.write(self.meta + "\n")
+        f.write(self.rules + "\n")
+
+        for i, player in enumerate(self.players):
+            f.write(str(i + 1) + "\t" + player.name + "\t" + str(player.character) + "\n")
+            f.write("\n")
+            for action in player.actions:
+                f.write(str(action.frame_num) + "\t" + action.input_id + "\n")
+
+            f.write("\n")
+
+        f.close()
+
 
 # The Player class is a wrapper for our player file, it contains the raw
-# information that we pull from the replay file as information that we can
+# nformation that we pull from the replay file as information that we can
 # easily work with in python.
 class Player:
     def __init__(self, p_info, p_replay):
@@ -157,5 +176,6 @@ if __name__ == "__main__":
 
     for replay in replays:
         replay.print_replay()
+        replay.to_file()
 
     print("Parsed", (len(sys.argv) - 1), "Replays in", (parse_time * 1000), "ms")
