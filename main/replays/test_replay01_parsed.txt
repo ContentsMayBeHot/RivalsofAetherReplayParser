@@ -1,8 +1,6 @@
 001020121482521102017REPLAY 2017-10-21 (21:48)                                                                                                                                                   0000031970
 
-00503082000000000
-
-1	REI	Character.CLAIREN
+Stage.MERCHANT_PORT	StageType.BASIC1	REI	Character.CLAIREN
 
 1	Z
 124	z

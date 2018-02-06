@@ -144,7 +144,6 @@ class Action:
 
         return self.map_actions(simp_action)
 
-
     def map_actions(self, x):
         return{
             'L' : ActionType.LEFT_PRESS,
@@ -188,7 +187,6 @@ class Action:
             'Z' : ActionType.ANG_TOGGLE_PRESS,
             'z' : ActionType.ANG_TOGGLE_RELEASE
         }.get(x, ActionType.INVALID)
-
 
     def get_ms_from_start(self):
         return (self.frame_index / 60.00) * 1000
