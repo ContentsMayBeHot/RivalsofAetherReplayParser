@@ -18,12 +18,18 @@ class Replay:
         lines = f.readlines()
         self.file_name = f.name
         self.meta = self.get_meta(lines[0])
+        self.duration = self.get_duration(lines[0])
         self.stage_type, self.stage_id = self.get_stage(lines[1])
         self.players = []
         self.get_players(lines[2:])
 
     def get_meta(self, meta_line):
         return meta_line
+
+    def get_duration(self, line):
+        left = line.find('(')+1
+        right = line.find(')')-1
+        return line[left:right]
 
     def get_stage(self, line):
         return StageType(int(line[0])), Stage(int(line[1:3]))
@@ -63,6 +69,10 @@ class Replay:
             f.write("\n")
 
         f.close()
+
+    def get_duration_ms(self):
+        minutes,seconds = self.duration.split(':')
+        return int(seconds) + (int(minutes)*60) * 1000
 
 
 # The Player class is a wrapper for our player file, it contains the raw
