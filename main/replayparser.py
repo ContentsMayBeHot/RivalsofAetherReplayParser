@@ -8,6 +8,7 @@ import sys
 from enum import Enum
 import time
 
+
 def parse_wrapper(pass_fname):
     return Replay(pass_fname)
 
@@ -27,8 +28,8 @@ class Replay:
         return meta_line
 
     def get_duration(self, line):
-        left = line.find('(')+1
-        right = line.find(')')-1
+        left = line.find('(') + 1
+        right = line.find(')') - 1
         return line[left:right]
 
     def get_stage(self, line):
@@ -45,11 +46,17 @@ class Replay:
         print("Stage: ", self.stage_id, self.stage_type)
         print("----------------------------")
         for i, player in enumerate(self.players):
-            print("Player " + str(i+1) + ": ", player.name)
+            print("Player " + str(i + 1) + ": ", player.name)
             print("Character:", player.character)
             print("----------------------------")
             for action in player.actions:
-                print ("On Frame #:", action.frame_index, "action " + action.input_id + " took place", action.type)
+                print(
+                    "On Frame #:",
+                    action.frame_index,
+                    "action " +
+                    action.input_id +
+                    " took place",
+                    action.type)
 
     def to_file(self):
         file_name = self.file_name[:-4]
@@ -61,18 +68,20 @@ class Replay:
         f.write(str(self.stage_id) + "\t" + str(self.stage_type) + "\n")
 
         for i, player in enumerate(self.players):
-            f.write(str(i + 1) + "\t" + player.name + "\t" + str(player.character) + "\n")
+            f.write(str(i + 1) + "\t" + player.name +
+                    "\t" + str(player.character) + "\n")
             f.write("\n")
             for action in player.actions:
-                f.write(str(action.frame_index) + "\t" + action.input_id + "\t" + str(action.type) + "\n")
+                f.write(str(action.frame_index) + "\t" +
+                        action.input_id + "\t" + str(action.type) + "\n")
 
             f.write("\n")
 
         f.close()
 
     def get_duration_ms(self):
-        minutes,seconds = self.duration.split(':')
-        return int(seconds) + (int(minutes)*60) * 1000
+        minutes, seconds = self.duration.split(':')
+        return int(seconds) + (int(minutes) * 60) * 1000
 
 
 # The Player class is a wrapper for our player file, it contains the raw
@@ -124,7 +133,8 @@ class Player:
                 input_str = input_str + replay_line[lower_bound + position]
                 break
             else:
-                input_str = input_str + replay_line[lower_bound + position : lower_bound + position + 4]
+                input_str = input_str + \
+                    replay_line[lower_bound + position: lower_bound + position + 4]
                 position += 3
                 break
 
@@ -156,53 +166,55 @@ class Action:
 
     def map_actions(self, x):
         return{
-            'L' : ActionType.LEFT_PRESS,
-            'l' : ActionType.LEFT_RELEASE,
-            'E' : ActionType.LEFT_TAP,
-            'R' : ActionType.RIGHT_PRESS,
-            'r' : ActionType.RIGHT_RELEASE,
-            'I' : ActionType.RIGHT_TAP,
-            'U' : ActionType.UP_PRESS,
-            'u' : ActionType.UP_RELEASE,
-            'M' : ActionType.UP_TAP,
-            'D' : ActionType.DOWN_PRESS,
-            'd' : ActionType.DOWN_RELEASE,
-            'O' : ActionType.DOWN_TAP,
-            'A' : ActionType.ATTACK_PRESS,
-            'a' : ActionType.ATTACK_RELEASE,
-            'B' : ActionType.SPECIAL_PRESS,
-            'b' : ActionType.SPECIAL_RELEASE,
-            'J' : ActionType.JUMP_PRESS,
-            'j' : ActionType.JUMP_RELEASE,
-            'S' : ActionType.DODGE_PRESS,
-            's' : ActionType.DODGE_RELEASE,
-            'C' : ActionType.STRONG_PRESS,
-            'c' : ActionType.STRONG_RELEASE,
-            'F' : ActionType.STRONG_LEFT_PRESS,
-            'f' : ActionType.STRONG_LEFT_RELEASE,
-            'G' : ActionType.STRONG_RIGHT_PRESS,
-            'g' : ActionType.STRONG_RIGHT_RELEASE,
-            'X' : ActionType.STRONG_UP_PRESS,
-            'x' : ActionType.STRONG_UP_RELEASE,
-            'W' : ActionType.STRONG_DOWN_PRESS,
-            'w' : ActionType.STRONG_DOWN_RELEASE,
-            0 : ActionType.ANG_RIGHT,
-            45 : ActionType.ANG_UP_RIGHT,
-            90 : ActionType.ANG_UP,
-            135 : ActionType.ANG_UP_LEFT,
-            180 : ActionType.ANG_LEFT,
-            225 : ActionType.ANG_DOWN_LEFT,
-            270 : ActionType.ANG_DOWN,
-            315 : ActionType.ANG_DOWN_RIGHT,
-            'Z' : ActionType.ANG_TOGGLE_PRESS,
-            'z' : ActionType.ANG_TOGGLE_RELEASE
+            'L': ActionType.LEFT_PRESS,
+            'l': ActionType.LEFT_RELEASE,
+            'E': ActionType.LEFT_TAP,
+            'R': ActionType.RIGHT_PRESS,
+            'r': ActionType.RIGHT_RELEASE,
+            'I': ActionType.RIGHT_TAP,
+            'U': ActionType.UP_PRESS,
+            'u': ActionType.UP_RELEASE,
+            'M': ActionType.UP_TAP,
+            'D': ActionType.DOWN_PRESS,
+            'd': ActionType.DOWN_RELEASE,
+            'O': ActionType.DOWN_TAP,
+            'A': ActionType.ATTACK_PRESS,
+            'a': ActionType.ATTACK_RELEASE,
+            'B': ActionType.SPECIAL_PRESS,
+            'b': ActionType.SPECIAL_RELEASE,
+            'J': ActionType.JUMP_PRESS,
+            'j': ActionType.JUMP_RELEASE,
+            'S': ActionType.DODGE_PRESS,
+            's': ActionType.DODGE_RELEASE,
+            'C': ActionType.STRONG_PRESS,
+            'c': ActionType.STRONG_RELEASE,
+            'F': ActionType.STRONG_LEFT_PRESS,
+            'f': ActionType.STRONG_LEFT_RELEASE,
+            'G': ActionType.STRONG_RIGHT_PRESS,
+            'g': ActionType.STRONG_RIGHT_RELEASE,
+            'X': ActionType.STRONG_UP_PRESS,
+            'x': ActionType.STRONG_UP_RELEASE,
+            'W': ActionType.STRONG_DOWN_PRESS,
+            'w': ActionType.STRONG_DOWN_RELEASE,
+            0: ActionType.ANG_RIGHT,
+            45: ActionType.ANG_UP_RIGHT,
+            90: ActionType.ANG_UP,
+            135: ActionType.ANG_UP_LEFT,
+            180: ActionType.ANG_LEFT,
+            225: ActionType.ANG_DOWN_LEFT,
+            270: ActionType.ANG_DOWN,
+            315: ActionType.ANG_DOWN_RIGHT,
+            'Z': ActionType.ANG_TOGGLE_PRESS,
+            'z': ActionType.ANG_TOGGLE_RELEASE
         }.get(x, ActionType.INVALID)
 
     def get_ms_from_start(self):
         return (self.frame_index / 60.00) * 1000
 
     def get_ms_delta(self, action):
-        return ((self.frame_index / 60.00) * 1000) - ((action.frame_index / 60.00) * 1000)
+        return ((self.frame_index / 60.00) * 1000) - \
+            ((action.frame_index / 60.00) * 1000)
+
 
 class ActionType(Enum):
     INVALID = -1
@@ -262,10 +274,12 @@ class ActionType(Enum):
     ANG_TOGGLE_PRESS = 38
     ANG_TOGGLE_RELEASE = 39
 
+
 class StageType(Enum):
     INVALID = -1
     BASIC = 0
     AETHER = 1
+
 
 class Stage(Enum):
     INVALID = -1
@@ -278,6 +292,7 @@ class Stage(Enum):
     ALSO_NOTHING = 6
     BLAZING_HIDEOUT = 7
     TOWER_HEAVEN = 8
+
 
 class Character(Enum):
     NONE = 0
@@ -294,12 +309,13 @@ class Character(Enum):
     RANNO = 11
     CLAIREN = 12
 
+
 if __name__ == "__main__":
     replays = []
     parse_time = 0
 
     if(len(sys.argv) < 2):
-        print ("You must include a file.")
+        print("You must include a file.")
     elif(len(sys.argv) > 2):
         for i, arg in enumerate(sys.argv):
             if(i != 0):
@@ -317,4 +333,5 @@ if __name__ == "__main__":
         replay.print_replay()
         replay.to_file()
 
-    print("Parsed", (len(sys.argv) - 1), "Replays in", (parse_time * 1000), "ms")
+    print("Parsed", (len(sys.argv) - 1),
+          "Replays in", (parse_time * 1000), "ms")
