@@ -8,13 +8,13 @@ import sys
 from enum import Enum
 import time
 
-def parse_wrapper(file_name):
-    return Replay(file_name)
+def parse_wrapper(pass_fname):
+    return Replay(pass_fname)
 
 
 class Replay:
-    def __init__(self, file_name):
-        f = open(file_name, "r")
+    def __init__(self, pass_fname):
+        f = open(pass_fname, "r")
         lines = f.readlines()
         self.file_name = f.name
         self.meta = self.get_meta(lines[0])
