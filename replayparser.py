@@ -9,40 +9,36 @@ from enum import Enum
 import time
 
 
-def parse_wrapper(pass_fname):
-    return Replay(pass_fname)
+def parse_wrapper(roa_apath):
+    return Replay(roa_apath)
 
 
 class Replay:
-    def __init__(self, pass_fname):
-        f = open(pass_fname, "r")
-        lines = f.readlines()
-        self.file_name = f.name
-        self.meta = self.get_meta(lines[0])
-        self.duration = self.get_duration(lines[0])
-        self.stage_type, self.stage_id = self.get_stage(lines[1])
+    def __init__(self, roa_apath):
+        fin = open(roa_apath, "r")
+        self.fname = fin.name
+
+        # Read metadata
+        ln = fin.readline()
+        self.meta = ln
+        left = ln.find('(') + 1
+        right = ln.find(')') - 1
+        self.duration = ln[left:right]
+
+        # Read match info
+        ln = fin.readline()
+        self.stage_type = StageType(int(ln[0]))
+        self.stage_id = Stage(int(ln[1:3]))
+
+        # Read players and actions
         self.players = []
-        self.get_players(lines[2:])
-
-    def get_meta(self, meta_line):
-        return meta_line
-
-    def get_duration(self, line):
-        left = line.find('(') + 1
-        right = line.find(')') - 1
-        return line[left:right]
-
-    def get_stage(self, line):
-        return StageType(int(line[0])), Stage(int(line[1:3]))
-
-    def get_players(self, player_lines):
-        for i, line in enumerate(player_lines):
-            if (i % 2 == 0):
-                if(line[0] == 'H'):
-                    self.players.append(Player(line, player_lines[i + 1]))
+        for ln in fin:
+            if(ln[0] == 'H'):
+                ln_next = fin.readline()
+                self.players.append(Player(ln, ln_next))
 
     def print_replay(self):
-        print("Replay Name:", self.file_name)
+        print("Replay Name:", self.fname)
         print("Stage: ", self.stage_id, self.stage_type)
         print("----------------------------")
         for i, player in enumerate(self.players):
@@ -59,7 +55,7 @@ class Replay:
                     action.type)
 
     def to_file(self):
-        file_name = self.file_name[:-4]
+        file_name = self.fname[:-4]
         file_name += "_parsed.txt"
 
         f = open(file_name, "w+")
