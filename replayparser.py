@@ -84,37 +84,25 @@ class Replay:
 # nformation that we pull from the replay file as information that we can
 # easily work with in python.
 class Player:
-    def __init__(self, p_info, p_replay):
-        self.name = self.get_name(p_info)
-        self.character = self.get_character(p_info)
+    def __init__(self, ln_info, ln_actions):
+        self.name = ln_info[1:33].rstrip()
+        self.character = Character(int(ln_info[39:41]))
+
         self.actions = []
-        self.get_actions(p_replay)
-
-    def get_name(self, info_line):
-        name = info_line[1:33]
-        name = name.rstrip()
-        return name
-
-    def get_character(self, info_line):
-        character_id = info_line[39:41]
-        enum = Character(int(character_id))
-        return enum
-
-    def get_actions(self, replay_line):
         i = 0
-        #self.getSingleAction(0, replay_line, actions)
+        #self.getSingleAction(0, ln_actions, actions)
         #print("action_frame", actions[0].frame_index, "action id", actions[0].input_id)
-        while i < len(replay_line):
-            i += self.get_single_action(i, replay_line)
+        while i < len(ln_actions):
+            i += self.get_single_action(i, ln_actions)
 
-    def get_single_action(self, lower_bound, replay_line):
+    def get_single_action(self, lower_bound, ln_actions):
         position = 0
         frame_str = ""
         input_str = ""
 
         while True:
-            if replay_line[lower_bound + position].isdigit():
-                frame_str = frame_str + replay_line[lower_bound + position]
+            if ln_actions[lower_bound + position].isdigit():
+                frame_str = frame_str + ln_actions[lower_bound + position]
                 position += 1
             else:
                 break
@@ -125,12 +113,12 @@ class Player:
             frame_str = self.actions[-1].frame_index
 
         while True:
-            if replay_line[lower_bound + position] != 'y':
-                input_str = input_str + replay_line[lower_bound + position]
+            if ln_actions[lower_bound + position] != 'y':
+                input_str = input_str + ln_actions[lower_bound + position]
                 break
             else:
                 input_str = input_str + \
-                    replay_line[lower_bound + position: lower_bound + position + 4]
+                    ln_actions[lower_bound + position: lower_bound + position + 4]
                 position += 3
                 break
 
