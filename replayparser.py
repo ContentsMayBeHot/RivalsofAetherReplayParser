@@ -21,9 +21,6 @@ class Replay:
         # Read metadata
         ln = fin.readline()
         self.meta = ln
-        left = ln.find('(') + 1
-        right = ln.find(')') - 1
-        self.duration = ln[left:right]
 
         # Read match info
         ln = fin.readline()
@@ -76,8 +73,8 @@ class Replay:
         f.close()
 
     def get_duration(self, as_ms=False):
-        minutes, seconds = self.duration.split(':')
-        duration = int(seconds) + (int(minutes) * 60)
+        last_frame = max([x.actions[-1].frame_index for x in self.players])
+        duration = int(last_frame) * 60
         if as_ms:
             duration *= 1000
         return duration
