@@ -292,9 +292,7 @@ class Stage(Enum):
     ALSO_NOTHING = 6
     BLAZING_HIDEOUT = 7
     TOWER_HEAVEN = 8
-
-    def get_default(self):
-        return self.INVALID
+    TEMPEST_PEAK = 9
 
 
 class Character(Enum):
@@ -312,8 +310,6 @@ class Character(Enum):
     RANNO = 11
     CLAIREN = 12
 
-    def get_default(self):
-        return self.INVALID
 
 if __name__ == "__main__":
     replays = []
