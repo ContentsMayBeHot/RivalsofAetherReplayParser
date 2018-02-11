@@ -75,9 +75,12 @@ class Replay:
 
         f.close()
 
-    def get_duration_ms(self):
+    def get_duration(self, as_ms=False):
         minutes, seconds = self.duration.split(':')
-        return int(seconds) + (int(minutes) * 60) * 1000
+        duration = int(seconds) + (int(minutes) * 60)
+        if as_ms:
+            duration *= 1000
+        return duration
 
 
 # The Player class is a wrapper for our player file, it contains the raw
