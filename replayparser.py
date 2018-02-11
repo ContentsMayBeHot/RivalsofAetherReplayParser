@@ -9,40 +9,36 @@ from enum import Enum
 import time
 
 
-def parse_wrapper(pass_fname):
-    return Replay(pass_fname)
+def parse_wrapper(roa_apath):
+    return Replay(roa_apath)
 
 
 class Replay:
-    def __init__(self, pass_fname):
-        f = open(pass_fname, "r")
-        lines = f.readlines()
-        self.file_name = f.name
-        self.meta = self.get_meta(lines[0])
-        self.duration = self.get_duration(lines[0])
-        self.stage_type, self.stage_id = self.get_stage(lines[1])
+    def __init__(self, roa_apath):
+        fin = open(roa_apath, "r")
+        self.fname = fin.name
+
+        # Read metadata
+        ln = fin.readline()
+        self.meta = ln
+        left = ln.find('(') + 1
+        right = ln.find(')') - 1
+        self.duration = ln[left:right]
+
+        # Read match info
+        ln = fin.readline()
+        self.stage_type = StageType(int(ln[0]))
+        self.stage_id = Stage(int(ln[1:3]))
+
+        # Read players and actions
         self.players = []
-        self.get_players(lines[2:])
-
-    def get_meta(self, meta_line):
-        return meta_line
-
-    def get_duration(self, line):
-        left = line.find('(') + 1
-        right = line.find(')') - 1
-        return line[left:right]
-
-    def get_stage(self, line):
-        return StageType(int(line[0])), Stage(int(line[1:3]))
-
-    def get_players(self, player_lines):
-        for i, line in enumerate(player_lines):
-            if (i % 2 == 0):
-                if(line[0] == 'H'):
-                    self.players.append(Player(line, player_lines[i + 1]))
+        for ln in fin:
+            if(ln[0] == 'H'):
+                ln_next = fin.readline()
+                self.players.append(Player(ln, ln_next))
 
     def print_replay(self):
-        print("Replay Name:", self.file_name)
+        print("Replay Name:", self.fname)
         print("Stage: ", self.stage_id, self.stage_type)
         print("----------------------------")
         for i, player in enumerate(self.players):
@@ -59,7 +55,7 @@ class Replay:
                     action.type)
 
     def to_file(self):
-        file_name = self.file_name[:-4]
+        file_name = self.fname[:-4]
         file_name += "_parsed.txt"
 
         f = open(file_name, "w+")
@@ -88,37 +84,25 @@ class Replay:
 # nformation that we pull from the replay file as information that we can
 # easily work with in python.
 class Player:
-    def __init__(self, p_info, p_replay):
-        self.name = self.get_name(p_info)
-        self.character = self.get_character(p_info)
+    def __init__(self, ln_info, ln_actions):
+        self.name = ln_info[1:33].rstrip()
+        self.character = Character(int(ln_info[39:41]))
+
         self.actions = []
-        self.get_actions(p_replay)
-
-    def get_name(self, info_line):
-        name = info_line[1:33]
-        name = name.rstrip()
-        return name
-
-    def get_character(self, info_line):
-        character_id = info_line[39:41]
-        enum = Character(int(character_id))
-        return enum
-
-    def get_actions(self, replay_line):
         i = 0
-        #self.getSingleAction(0, replay_line, actions)
+        #self.getSingleAction(0, ln_actions, actions)
         #print("action_frame", actions[0].frame_index, "action id", actions[0].input_id)
-        while i < len(replay_line):
-            i += self.get_single_action(i, replay_line)
+        while i < len(ln_actions):
+            i += self.get_single_action(i, ln_actions)
 
-    def get_single_action(self, lower_bound, replay_line):
+    def get_single_action(self, lower_bound, ln_actions):
         position = 0
         frame_str = ""
         input_str = ""
 
         while True:
-            if replay_line[lower_bound + position].isdigit():
-                frame_str = frame_str + replay_line[lower_bound + position]
+            if ln_actions[lower_bound + position].isdigit():
+                frame_str = frame_str + ln_actions[lower_bound + position]
                 position += 1
             else:
                 break
@@ -129,12 +113,12 @@ class Player:
             frame_str = self.actions[-1].frame_index
 
         while True:
-            if replay_line[lower_bound + position] != 'y':
-                input_str = input_str + replay_line[lower_bound + position]
+            if ln_actions[lower_bound + position] != 'y':
+                input_str = input_str + ln_actions[lower_bound + position]
                 break
             else:
                 input_str = input_str + \
-                    replay_line[lower_bound + position: lower_bound + position + 4]
+                    ln_actions[lower_bound + position: lower_bound + position + 4]
                 position += 3
                 break
 
