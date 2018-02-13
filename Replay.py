@@ -1,88 +1,43 @@
-# replayparser.py by Rei Armenia(lazerzes)
-#
-# This function set takes in a .roa replay file and extracts the information
-# that the user may find useful.
-
+# Replay.py by Rei Armenia
+# With Contributions by Matthew Harrison
 
 import sys
+import os
 from enum import Enum
-import time
-
-
-def parse_wrapper(roa_apath):
-    return Replay(roa_apath)
 
 
 class Replay:
     def __init__(self, roa_apath):
-        fin = open(roa_apath, "r")
-        self.fname = fin.name
-
-        # Read metadata
-        ln = fin.readline()
-        self.meta = ln
-
-        # Read match info
-        ln = fin.readline()
-        self.stage_type = StageType(int(ln[0]))
-        self.stage_id = Stage(int(ln[1:3]))
-
-        # Read players and actions
+        f_in = open(roa_apath, "r")
+        self.f_name = f_in.name
+        f_lines = f_in.readlines()
+        f_in.close()
+        print(self.f_name)
+        self.meta = MetaData(f_lines[0])
+        self.rules = RuleData(f_lines[1])
         self.players = []
-        for ln in fin:
-            if(ln[0] == 'H'):
-                ln_next = fin.readline()
-                self.players.append(Player(ln, ln_next))
-
-    def print_replay(self):
-        print("Replay Name:", self.fname)
-        print("Stage: ", self.stage_id, self.stage_type)
-        print("----------------------------")
-        for i, player in enumerate(self.players):
-            print("Player " + str(i + 1) + ": ", player.name)
-            print("Character:", player.character)
-            print("----------------------------")
-            for action in player.actions:
-                print(
-                    "On Frame #:",
-                    action.frame_index,
-                    "action " +
-                    action.input_id +
-                    " took place",
-                    action.type)
-
-    def to_file(self):
-        file_name = self.fname[:-4]
-        file_name += "_parsed.txt"
-
-        f = open(file_name, "w+")
-
-        f.write(self.meta + "\n")
-        f.write(str(self.stage_id) + "\t" + str(self.stage_type) + "\n")
-
-        for i, player in enumerate(self.players):
-            f.write(str(i + 1) + "\t" + player.name +
-                    "\t" + str(player.character) + "\n")
-            f.write("\n")
-            for action in player.actions:
-                f.write(str(action.frame_index) + "\t" +
-                        action.input_id + "\t" + str(action.type) + "\n")
-
-            f.write("\n")
-
-        f.close()
-
-    def get_duration(self, as_ms=False):
-        last_frame = max([x.actions[-1].frame_index for x in self.players])
-        duration = int(last_frame) / 60
-        if as_ms:
-            duration *= 1000
-        return duration
+        for i, line in enumerate(f_lines[2:]):
+            if line[0] is 'H':
+                self.players.append(Player(line, f_lines[i + 1]))
 
 
-# The Player class is a wrapper for our player file, it contains the raw
-# nformation that we pull from the replay file as information that we can
-# easily work with in python.
+class MetaData:
+    def __init__(self, meta_line):
+        self.is_starred = bool(int(meta_line[0]))
+        self.version = meta_line[1:8]
+        self.date_time = meta_line[8:22]
+
+
+class RuleData:
+    def __init__(self, rule_line):
+        self.stage_type = StageType(int(rule_line[0]))
+        self.stage_id = Stage(int(rule_line[1:3]))
+        self.stock_count = rule_line[3:5]
+        self.time = rule_line[5:7]
+        self.team = bool(int(rule_line[7]))
+        self.friendly_fire = bool(int(rule_line[8]))
+
+
 class Player:
     def __init__(self, ln_info, ln_actions):
         self.name = ln_info[1:33].rstrip()
@@ -90,8 +45,6 @@ class Player:
 
         self.actions = []
         i = 0
-        #self.getSingleAction(0, ln_actions, actions)
-        #print("action_frame", actions[0].frame_index, "action id", actions[0].input_id)
         while i < len(ln_actions):
             i += self.get_single_action(i, ln_actions)
 
@@ -277,6 +230,8 @@ class Stage(Enum):
     BLAZING_HIDEOUT = 7
     TOWER_HEAVEN = 8
     TEMPEST_PEAK = 9
+    SOMETHING = 10
+    ANOTHER = 11
 
 
 class Character(Enum):
@@ -297,26 +252,17 @@ class Character(Enum):
 
 if __name__ == "__main__":
     replays = []
-    parse_time = 0
 
     if(len(sys.argv) < 2):
-        print("You must include a file.")
-    elif(len(sys.argv) > 2):
-        for i, arg in enumerate(sys.argv):
-            if(i != 0):
-                before = time.time()
-                replays.append(parse_wrapper(arg))
-                after = time.time()
-                parse_time += (after - before)
+        print("You must include a file!")
+
+    elif (len(sys.argv) >= 2 and sys.argv[1] == "-d"):
+        print("Getting files from directory")
+        for roa_apath in os.listdir(sys.argv[2]):
+            if roa_apath.endswith('.roa'):
+                replays.append(Replay(sys.argv[2] + roa_apath))
+
     else:
-        before = time.time()
-        replays.append(parse_wrapper(sys.argv[1]))
-        after = time.time()
-        parse_time += (after - before)
-
-    for replay in replays:
-        replay.print_replay()
-        replay.to_file()
-
-    print("Parsed", (len(sys.argv) - 1),
-          "Replays in", (parse_time * 1000), "ms")
+        for roa_apath in sys.argv[2:]:
+            if roa_apath.endswith('.roa'):
+                replays.append(Replay(roa_apath))
