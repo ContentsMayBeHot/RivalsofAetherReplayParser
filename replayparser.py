@@ -1,9 +1,10 @@
-# Replay.py by Rei Armenia
+# replayparser.py by Rei Armenia
 # With Contributions by Matthew Harrison
 
 import sys
 import os
 from enum import Enum
+import numpy as np
 
 
 class Replay:
@@ -89,6 +90,12 @@ class Action:
         self.frame_index = int(frame_str)
         self.input_id = input_id
         self.type = self.cast_action()
+        self.matrix = self.initialize_matrix()
+
+    def initialize_matrix(self):
+        temp_array = np.zeros((1,40))
+        temp_array[self.type.value] = 1
+        return temp_array
 
     def cast_action(self):
         simp_action = 0
@@ -251,6 +258,7 @@ class Character(Enum):
 
 
 if __name__ == "__main__":
+
     replays = []
 
     if(len(sys.argv) < 2):
@@ -266,3 +274,5 @@ if __name__ == "__main__":
         for roa_apath in sys.argv[2:]:
             if roa_apath.endswith('.roa'):
                 replays.append(Replay(roa_apath))
+
+    # TODO:: Have a command line argument that creates outut files
