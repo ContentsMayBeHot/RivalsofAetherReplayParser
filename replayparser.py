@@ -1,5 +1,9 @@
 # replayparser.py by Rei Armenia
 # With Contributions by Matthew Harrison
+# You can find the repo for this
+# here(https://github.com/ContentsMayBeHot/RivalsofAetherReplayParser)
+# You can find the docs for this
+# here(https://github.com/ContentsMayBeHot/RivalsofAetherReplayParser/wiki)
 
 import sys
 import os
@@ -7,6 +11,7 @@ from enum import Enum
 import numpy as np
 import pathlib
 import ntpath
+
 
 class Replay:
     def __init__(self, roa_apath):
@@ -40,6 +45,7 @@ class Replay:
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
 
+
 class MetaData:
     def __init__(self, meta_line):
         self.is_starred = bool(int(meta_line[0]))
@@ -49,6 +55,7 @@ class MetaData:
     def format_meta_str(self):
         return str(self.is_starred) + "\t" + self.version + \
             "\t" + self.date_time + "\n"
+
 
 class RuleData:
     def __init__(self, rule_line):
@@ -62,6 +69,7 @@ class RuleData:
     def format_rule_str(self):
         return str(self.stage_type) + "\t" + str(self.stage_id) + "\t" + str(self.stock_count) + \
             "\t" + str(self.time) + "\t" + str(self.team) + "\t" + str(self.friendly_fire) + "\n"
+
 
 class Player:
     def __init__(self, ln_info, ln_actions):
@@ -134,6 +142,7 @@ class Player:
 
         return out_list
 
+
 class Action:
     def __init__(self, frame_str, input_id):
         self.frame_index = int(frame_str)
@@ -146,7 +155,8 @@ class Action:
         if not to_file:
             return str(self.frame_index) + "\t" + str(self.type) + "\n"
         else:
-            return str(self.frame_index) + "\t" + str(self.simple_matrix) + "\n"
+            return str(self.frame_index) + "\t" + \
+                str(self.simple_matrix) + "\n"
 
     def initialize_matrix(self):
         if self.type is ActionType.INVALID:
@@ -272,6 +282,7 @@ class Action:
         return ((self.frame_index / 60.00) * 1000) - \
             ((action.frame_index / 60.00) * 1000)
 
+
 class ActionType(Enum):
     INVALID = -1
 
@@ -330,6 +341,7 @@ class ActionType(Enum):
     ANG_TOGGLE_PRESS = 38
     ANG_TOGGLE_RELEASE = 39
 
+
 class SimpleAction(Enum):
     INVALID = -1
 
@@ -367,10 +379,12 @@ class SimpleAction(Enum):
 
     ANG_TOGGLE = 25
 
+
 class StageType(Enum):
     INVALID = -1
     BASIC = 0
     AETHER = 1
+
 
 class Stage(Enum):
     INVALID = -1
@@ -387,6 +401,7 @@ class Stage(Enum):
     SOMETHING = 10
     ANOTHER = 11
 
+
 class Character(Enum):
     NONE = 0
     INVALID = 1
@@ -401,6 +416,7 @@ class Character(Enum):
     ORI = 10
     RANNO = 11
     CLAIREN = 12
+
 
 if __name__ == "__main__":
 
@@ -433,7 +449,7 @@ if __name__ == "__main__":
 
         elif cmd[0] == '-d' and len(cmd) > 1:
             for dir_apath in cmd[1:]:
-                print("Parsing Files from " + dir_apath +":")
+                print("Parsing Files from " + dir_apath + ":")
                 for roa_apath in os.listdir(dir_apath):
                     if(roa_apath.endswith('.roa')):
                         print("\tParsing " + roa_apath + "...")
@@ -453,7 +469,8 @@ if __name__ == "__main__":
             to_console = True
 
         elif cmd[0] == '-help':
-            print("\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
+            print(
+                "\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
             print("Commands:")
             print("\t -f : parse following files")
             print("\t -d : parse all files in following directories")
@@ -465,15 +482,15 @@ if __name__ == "__main__":
             print(cmd[0], "is not a supported command")
 
     if out_dir:
-            print("Creating Simplified Replays")
-            for replay in replays:
-                dir_path = "output/"
-                pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
-                file_name = ntpath.basename(replay.f_name[:-4])
-                out_path = dir_path + file_name + "_parsed.txt"
-                print("\t" + replay.f_name + " =txt=> " + out_path)
-                f_out = open(out_path, "w+")
-                f_out.write(replay.format_replay_str(False))
+        print("Creating Simplified Replays")
+        for replay in replays:
+            dir_path = "output/"
+            pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
+            file_name = ntpath.basename(replay.f_name[:-4])
+            out_path = dir_path + file_name + "_parsed.txt"
+            print("\t" + replay.f_name + " =txt=> " + out_path)
+            f_out = open(out_path, "w+")
+            f_out.write(replay.format_replay_str(False))
 
     if to_np:
         print("Creating Numpy Files")
@@ -496,4 +513,5 @@ if __name__ == "__main__":
         print("\t -help : prints the help info(this)\n---------------\n\n")
 
     if(len(replays) > 0):
-        print("Program finished!\nProcessed " + str(len(replays)) + " replays!")
+        print("Program finished!\nProcessed " +
+              str(len(replays)) + " replays!")
