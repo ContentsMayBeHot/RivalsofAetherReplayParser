@@ -459,6 +459,7 @@ if __name__ == "__main__":
     if out_dir:
             print("Creating Simplified Replays")
             for replay in replays:
+                print("\tCreating txt file for " + replay.f_name)
                 dir_path = "output/"
                 pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
 
@@ -471,10 +472,12 @@ if __name__ == "__main__":
     if to_np:
         print("Creating Numpy Files")
         for replay in replays:
-            print("\tCreating file for " + replay.f_name)
+            print("\tCreating npy file for " + replay.f_name)
             replay.create_numpy()
 
     if to_console:
         for replay in replays:
             print(replay.f_name)
             print(replay.format_replay_str())
+
+    print("Program finished!\nProcessed " + str(len(replays)) + " replays!")
