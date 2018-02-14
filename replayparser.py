@@ -40,8 +40,6 @@ class Replay:
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
 
-
-
 class MetaData:
     def __init__(self, meta_line):
         self.is_starred = bool(int(meta_line[0]))
@@ -51,7 +49,6 @@ class MetaData:
     def format_meta_str(self):
         return str(self.is_starred) + "\t" + self.version + \
             "\t" + self.date_time + "\n"
-
 
 class RuleData:
     def __init__(self, rule_line):
@@ -65,7 +62,6 @@ class RuleData:
     def format_rule_str(self):
         return str(self.stage_type) + "\t" + str(self.stage_id) + "\t" + str(self.stock_count) + \
             "\t" + str(self.time) + "\t" + str(self.team) + "\t" + str(self.friendly_fire) + "\n"
-
 
 class Player:
     def __init__(self, ln_info, ln_actions):
@@ -405,7 +401,6 @@ class Character(Enum):
     ORI = 10
     RANNO = 11
     CLAIREN = 12
-
 
 if __name__ == "__main__":
 
