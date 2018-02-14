@@ -421,7 +421,7 @@ class Character(Enum):
 if __name__ == "__main__":
 
     passed_commands = []
-    possible_commands = ["-d", "-f", "-o", "-np", "-p", '-help']
+    possible_commands = ["-d", "-f", "-o", "-npy", "-p", '-help']
     replays = []
     out_dir = False
     to_np = False
@@ -462,7 +462,7 @@ if __name__ == "__main__":
         elif cmd[0] == '-o':
             out_dir = True
 
-        elif cmd[0] == '-np':
+        elif cmd[0] == '-npy':
             to_np = True
 
         elif cmd[0] == '-p':
@@ -476,7 +476,7 @@ if __name__ == "__main__":
             print("\t -d : parse all files in following directories")
             print("\t -o : output all parsed replays as .txt files")
             print("\t -p : output all parsed replays to console")
-            print("\t -np : output all parsed replays as pickled numpy arrays")
+            print("\t -npy : output all parsed replays as pickled numpy arrays")
             print("\t -help : prints the help info(this)\n---------------\n\n")
         else:
             print(cmd[0], "is not a supported command")
@@ -509,7 +509,7 @@ if __name__ == "__main__":
         print("\t -d : parse all files in following directories")
         print("\t -o : output all parsed replays as .txt files")
         print("\t -p : output all parsed replays to console")
-        print("\t -np : output all parsed replays as pickled numpy arrays")
+        print("\t -npy : output all parsed replays as pickled numpy arrays")
         print("\t -help : prints the help info(this)\n---------------\n\n")
 
     if(len(replays) > 0):
