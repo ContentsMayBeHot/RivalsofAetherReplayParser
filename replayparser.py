@@ -14,7 +14,6 @@ class Replay:
         self.f_name = f_in.name
         f_lines = f_in.readlines()
         f_in.close()
-        print(self.f_name)
         self.meta = MetaData(f_lines[0])
         self.rules = RuleData(f_lines[1])
         self.players = []
@@ -37,6 +36,7 @@ class Replay:
 
         for player in self.players:
             out_path = dir_path + player.name
+            print("\t" + self.f_name + " =npy=> " + out_path + ".npy")
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
 
@@ -431,13 +431,16 @@ if __name__ == "__main__":
 
     for cmd in passed_commands:
         if cmd[0] == '-f' and len(cmd) > 1:
+            print("Parsing Files:")
             for roa_apath in cmd[1:]:
                 replays.append(Replay(roa_apath))
 
         elif cmd[0] == '-d' and len(cmd) > 1:
             for dir_apath in cmd[1:]:
+                print("Parsing Files from " + dir_apath +":")
                 for roa_apath in os.listdir(dir_apath):
                     if(roa_apath.endswith('.roa')):
+                        print("\tParsing " + roa_apath + "...")
                         replays.append(Replay(dir_apath + roa_apath))
 
         elif cmd[0] == '-d' and len(cmd) == 1:
@@ -468,20 +471,17 @@ if __name__ == "__main__":
     if out_dir:
             print("Creating Simplified Replays")
             for replay in replays:
-                print("\tCreating txt file for " + replay.f_name)
                 dir_path = "output/"
                 pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
-
-
                 file_name = ntpath.basename(replay.f_name[:-4])
                 out_path = dir_path + file_name + "_parsed.txt"
+                print("\t" + replay.f_name + " =txt=> " + out_path)
                 f_out = open(out_path, "w+")
                 f_out.write(replay.format_replay_str(False))
 
     if to_np:
         print("Creating Numpy Files")
         for replay in replays:
-            print("\tCreating npy file for " + replay.f_name)
             replay.create_numpy()
 
     if to_console:
