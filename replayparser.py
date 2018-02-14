@@ -410,7 +410,7 @@ class Character(Enum):
 if __name__ == "__main__":
 
     passed_commands = []
-    possible_commands = ["-d", "-f", "-o", "-np", "-p"]
+    possible_commands = ["-d", "-f", "-o", "-np", "-p", '-help']
     replays = []
     out_dir = False
     to_np = False
@@ -453,6 +453,15 @@ if __name__ == "__main__":
         elif cmd[0] == '-p':
             to_console = True
 
+        elif cmd[0] == '-help':
+            print("\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
+            print("Commands:")
+            print("\t -f : parse following files")
+            print("\t -d : parse all files in following directories")
+            print("\t -o : output all parsed replays as .txt files")
+            print("\t -p : output all parsed replays to console")
+            print("\t -np : output all parsed replays as pickled numpy arrays")
+            print("\t -help : prints the help info(this)\n---------------\n\n")
         else:
             print(cmd[0], "is not a supported command")
 
@@ -480,4 +489,15 @@ if __name__ == "__main__":
             print(replay.f_name)
             print(replay.format_replay_str())
 
-    print("Program finished!\nProcessed " + str(len(replays)) + " replays!")
+    if (len(passed_commands) <= 0):
+        print("\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
+        print("Commands:")
+        print("\t -f : parse following files")
+        print("\t -d : parse all files in following directories")
+        print("\t -o : output all parsed replays as .txt files")
+        print("\t -p : output all parsed replays to console")
+        print("\t -np : output all parsed replays as pickled numpy arrays")
+        print("\t -help : prints the help info(this)\n---------------\n\n")
+
+    if(len(replays) > 0):
+        print("Program finished!\nProcessed " + str(len(replays)) + " replays!")
