@@ -259,20 +259,47 @@ class Character(Enum):
 
 if __name__ == "__main__":
 
+    passed_commands = []
+    possible_commands = ["-d", "-f", "-o"]
     replays = []
+    outdir_apath = False
 
-    if(len(sys.argv) < 2):
-        print("You must include a file!")
+    temp_command = []
+    for arg in sys.argv:
+        if arg in possible_commands:
+            if len(temp_command) > 0:
+                passed_commands.append(temp_command)
+                temp_command = []
+            temp_command.append(arg)
+        elif len(temp_command) > 0:
+            temp_command.append(arg)
 
-    elif (len(sys.argv) >= 2 and sys.argv[1] == "-d"):
-        print("Getting files from directory")
-        for roa_apath in os.listdir(sys.argv[2]):
-            if roa_apath.endswith('.roa'):
-                replays.append(Replay(sys.argv[2] + roa_apath))
+    if len(temp_command) > 0:
+        passed_commands.append(temp_command)
 
-    else:
-        for roa_apath in sys.argv[2:]:
-            if roa_apath.endswith('.roa'):
+    for cmd in passed_commands:
+        if cmd[0] == '-f' and len(cmd) > 1:
+            for roa_apath in cmd[1:]:
                 replays.append(Replay(roa_apath))
 
-    # TODO:: Have a command line argument that creates outut files
+        elif cmd[0] == '-d' and len(cmd) > 1:
+            for dir_apath in cmd[1:]:
+                for roa_apath in os.listdir(dir_apath):
+                    if(roa_apath.endswith('.roa')):
+                        replays.append(Replay(dir_apath + roa_apath))
+
+        elif cmd[0] == '-d' and len(cmd) == 1:
+            print("DIR not spec")
+            # TODO :: Grab all .roa files from cwd
+
+        elif cmd[0] == '-o':
+            outdir_apath = True
+
+        else:
+            print(cmd[0], "is not a supported command")
+
+        if outdir_apath:
+            print("Creating Simplified Replays in output/")
+
+    for replay in replays:
+        print(replay.f_name)
