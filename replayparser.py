@@ -6,6 +6,7 @@ import os
 from enum import Enum
 import numpy as np
 import pathlib
+import ntpath
 
 class Replay:
     def __init__(self, roa_apath):
@@ -31,7 +32,7 @@ class Replay:
         return out_str
 
     def create_numpy(self):
-        dir_path = self.f_name[:-4] + "/"
+        dir_path = "output/" + ntpath.basename(self.f_name[:-4]) + "/"
         pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
 
         for player in self.players:
@@ -275,7 +276,6 @@ class Action:
         return ((self.frame_index / 60.00) * 1000) - \
             ((action.frame_index / 60.00) * 1000)
 
-
 class ActionType(Enum):
     INVALID = -1
 
@@ -334,7 +334,6 @@ class ActionType(Enum):
     ANG_TOGGLE_PRESS = 38
     ANG_TOGGLE_RELEASE = 39
 
-
 class SimpleAction(Enum):
     INVALID = -1
 
@@ -372,12 +371,10 @@ class SimpleAction(Enum):
 
     ANG_TOGGLE = 25
 
-
 class StageType(Enum):
     INVALID = -1
     BASIC = 0
     AETHER = 1
-
 
 class Stage(Enum):
     INVALID = -1
@@ -394,7 +391,6 @@ class Stage(Enum):
     SOMETHING = 10
     ANOTHER = 11
 
-
 class Character(Enum):
     NONE = 0
     INVALID = 1
@@ -410,23 +406,15 @@ class Character(Enum):
     RANNO = 11
     CLAIREN = 12
 
-class FrameObject:
-    def __init__(self, frame, simple_matrix):
-        self.frame_index = frame
-        self.matrix = simple_matrix
-
-    def add_action(self, action):
-        self.matrix = np.add(self.matrix, action.simple_matrix)
-
-
 
 if __name__ == "__main__":
 
     passed_commands = []
-    possible_commands = ["-d", "-f", "-o", "-np"]
+    possible_commands = ["-d", "-f", "-o", "-np", "-p"]
     replays = []
     out_dir = False
-    to_np = True
+    to_np = False
+    to_console = False
 
     temp_command = []
     for arg in sys.argv:
@@ -462,23 +450,31 @@ if __name__ == "__main__":
         elif cmd[0] == '-np':
             to_np = True
 
+        elif cmd[0] == '-p':
+            to_console = True
+
         else:
             print(cmd[0], "is not a supported command")
 
-        if out_dir:
+    if out_dir:
             print("Creating Simplified Replays")
             for replay in replays:
-                out_path = replay.f_name[:-4]
-                out_path += "_parsed.txt"
+                dir_path = "output/"
+                pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
+
+
+                file_name = ntpath.basename(replay.f_name[:-4])
+                out_path = dir_path + file_name + "_parsed.txt"
                 f_out = open(out_path, "w+")
-                f_out.write(replay.format_replay_str(True))
+                f_out.write(replay.format_replay_str(False))
 
-        if to_np:
-            print("Creating Numpy Files")
-            for replay in replays:
-                print("\tCreating file for " + replay.f_name)
-                replay.create_numpy()
+    if to_np:
+        print("Creating Numpy Files")
+        for replay in replays:
+            print("\tCreating file for " + replay.f_name)
+            replay.create_numpy()
 
-    for replay in replays:
-        print(replay.f_name)
-        print(replay.format_replay_str())
+    if to_console:
+        for replay in replays:
+            print(replay.f_name)
+            print(replay.format_replay_str())
