@@ -428,6 +428,7 @@ if __name__ == "__main__":
         if cmd[0] == '-f' and len(cmd) > 1:
             print("Parsing Files:")
             for roa_apath in cmd[1:]:
+                print("\tParsing " + roa_apath + "...")
                 replays.append(Replay(roa_apath))
 
         elif cmd[0] == '-d' and len(cmd) > 1:
