@@ -10,7 +10,6 @@ import os
 from enum import Enum
 import numpy as np
 import pathlib
-import ntpath
 
 
 class Replay:
@@ -36,7 +35,7 @@ class Replay:
         return out_str
 
     def create_numpy(self):
-        dir_path = "output/" + ntpath.basename(self.f_name[:-4]) + "/"
+        dir_path = "output/" + os.path.basename(self.f_name[:-4]) + "/"
         pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
 
         for player in self.players:
@@ -492,7 +491,7 @@ if __name__ == "__main__":
         for replay in replays:
             dir_path = "output/"
             pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
-            file_name = ntpath.basename(replay.f_name[:-4])
+            file_name = os.path.basename(replay.f_name[:-4])
             out_path = dir_path + file_name + "_parsed.txt"
             print("\t" + replay.f_name + " =txt=> " + out_path)
             f_out = open(out_path, "w+")
