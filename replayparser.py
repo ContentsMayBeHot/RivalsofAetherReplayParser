@@ -44,7 +44,7 @@ class Replay:
             print("\t" + self.f_name + " =npy=> " + out_path + ".npy")
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
-           
+
     def get_duration(self, as_ms=False):
         last_frame = max([x.actions[-1].frame_index for x in self.players])
         duration = int(last_frame) / 60
@@ -414,6 +414,7 @@ class Stage(Enum):
     STAGE_NAME = 16
     NEO_FIRE_CAPITAL = 17
     SWAMPY_ESTUARY = 18
+
 
 class Character(Enum):
     NONE = 0
