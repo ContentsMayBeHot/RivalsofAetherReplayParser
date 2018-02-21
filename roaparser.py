@@ -432,6 +432,18 @@ class Character(Enum):
     CLAIREN = 12
 
 
+def print_help():
+    print(
+        "\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
+    print("Commands:")
+    print("\t -f : parse following files")
+    print("\t -d : parse all files in following directories")
+    print("\t -o : output all parsed replays as .txt files")
+    print("\t -p : output all parsed replays to console")
+    print("\t -npy : output all parsed replays as pickled numpy arrays")
+    print("\t -help : prints the help info(this)\n---------------\n\n")
+
+
 if __name__ == "__main__":
 
     passed_commands = []
@@ -483,15 +495,7 @@ if __name__ == "__main__":
             to_console = True
 
         elif cmd[0] == '-help':
-            print(
-                "\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
-            print("Commands:")
-            print("\t -f : parse following files")
-            print("\t -d : parse all files in following directories")
-            print("\t -o : output all parsed replays as .txt files")
-            print("\t -p : output all parsed replays to console")
-            print("\t -npy : output all parsed replays as pickled numpy arrays")
-            print("\t -help : prints the help info(this)\n---------------\n\n")
+            print_help()
         else:
             print(cmd[0], "is not a supported command")
 
@@ -517,14 +521,7 @@ if __name__ == "__main__":
             print(replay.format_replay_str())
 
     if (len(passed_commands) <= 0):
-        print("\n\n---------------\nreplayparser.py can be used to parse Rivals of Aether Replay Files")
-        print("Commands:")
-        print("\t -f : parse following files")
-        print("\t -d : parse all files in following directories")
-        print("\t -o : output all parsed replays as .txt files")
-        print("\t -p : output all parsed replays to console")
-        print("\t -npy : output all parsed replays as pickled numpy arrays")
-        print("\t -help : prints the help info(this)\n---------------\n\n")
+        print_help()
 
     if(len(replays) > 0):
         print("Program finished!\nProcessed " +
