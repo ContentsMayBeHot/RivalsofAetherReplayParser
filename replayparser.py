@@ -43,6 +43,13 @@ class Replay:
             print("\t" + self.f_name + " =npy=> " + out_path + ".npy")
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
+           
+    def get_duration(self, as_ms=False):
+        last_frame = max([x.actions[-1].frame_index for x in self.players])
+        duration = int(last_frame) / 60
+        if as_ms:
+            duration *= 1000
+        return duration
 
 
 class MetaData:
