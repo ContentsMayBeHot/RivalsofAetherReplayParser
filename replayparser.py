@@ -34,12 +34,13 @@ class Replay:
 
         return out_str
 
-    def create_numpy(self):
-        dir_path = "output/" + os.path.basename(self.f_name[:-4]) + "/"
-        pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
+    def create_numpy(self, numpydir_path=None):
+        if numpydir_path is None:
+            numpydir_path = os.path.join("output", os.path.basename(self.f_name[:-4]))
+        pathlib.Path(numpydir_path).mkdir(parents=True, exist_ok=True)
 
-        for player in self.players:
-            out_path = dir_path + player.name
+        for i, player in enumerate(self.players):
+            out_path = os.path.join(numpydir_path, str(i) + "_" + player.name)
             print("\t" + self.f_name + " =npy=> " + out_path + ".npy")
             arr = player.collapse_actions()
             np.save(out_path, np.array(arr, dtype=object))
