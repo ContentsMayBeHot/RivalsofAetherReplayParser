@@ -48,6 +48,18 @@ class Replay:
             np.save(out_path, np.array(arr, dtype=object))
 
     def get_duration(self, as_ms=False):
+        """function get_duration
+           gets the total duration of the replay.
+           
+           PRE:
+            Replay Object instantiated with a valid replay
+           
+           INS:
+            Optional Parameter: as_ms Boolean
+           
+           OUTS:
+            Duration of Replay, if as_ms in milliseconds else in seconds
+        """
         last_frame = max([x.actions[-1].frame_index for x in self.players])
         duration = int(last_frame) / 60
         if as_ms:
