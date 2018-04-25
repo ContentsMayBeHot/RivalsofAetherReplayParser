@@ -11,6 +11,8 @@ from enum import Enum
 import numpy as np
 import pathlib
 
+from roaenums import *
+
 
 class Replay:
     def __init__(self, roa_apath):
@@ -155,132 +157,27 @@ class Action:
         self.frame_index = int(frame_str)
         self.input_id = input_id
         self.type = self.cast_action()
-        self.matrix = self.initialize_matrix()
-        self.simple_matrix = self.initialize_simple_matrix()
+        self.simple = SimpleAction.map_simple(self.type)
+        self.matrix = ActionType.initialize_matrix(self.type)
+        self.simple_matrix = SimpleAction.initialize_simple_matrix(self.simple)
 
     def format_action_str(self, to_file=False):
         if not to_file:
             return str(self.frame_index) + "\t" + str(self.type) + "\n"
-        else:
-            return str(self.frame_index) + "\t" + \
-                str(self.simple_matrix) + "\n"
 
-    def initialize_matrix(self):
-        if self.type is ActionType.INVALID:
-            return np.zeros((40))
-
-        temp_array = np.zeros((40))
-        temp_array[self.type.value] = 1
-        return temp_array
-
-    def initialize_simple_matrix(self):
-        simp = self.map_simple()
-
-        if simp is SimpleAction.INVALID:
-            return np.zeros((26))
-
-        temp_array = np.zeros((26))
-        temp_array[simp.value] = 1
-        return temp_array
+        return str(self.frame_index) + "\t" + \
+               str(self.simple_matrix) + "\n"
 
     def cast_action(self):
         simp_action = 0
         if(self.input_id[0] in ['y', 'Y']):
             simp_action = 45 * round(float(self.input_id[1:]) / 45)
-            if(simp_action == 360):
+            if simp_action == 360:
                 simp_action = 0
         else:
             simp_action = self.input_id[0]
 
-        return self.map_actions(simp_action)
-
-    def map_actions(self, x):
-        return{
-            'L': ActionType.LEFT_PRESS,
-            'l': ActionType.LEFT_RELEASE,
-            'E': ActionType.LEFT_TAP,
-            'R': ActionType.RIGHT_PRESS,
-            'r': ActionType.RIGHT_RELEASE,
-            'I': ActionType.RIGHT_TAP,
-            'U': ActionType.UP_PRESS,
-            'u': ActionType.UP_RELEASE,
-            'M': ActionType.UP_TAP,
-            'D': ActionType.DOWN_PRESS,
-            'd': ActionType.DOWN_RELEASE,
-            'O': ActionType.DOWN_TAP,
-            'A': ActionType.ATTACK_PRESS,
-            'a': ActionType.ATTACK_RELEASE,
-            'B': ActionType.SPECIAL_PRESS,
-            'b': ActionType.SPECIAL_RELEASE,
-            'J': ActionType.JUMP_PRESS,
-            'j': ActionType.JUMP_RELEASE,
-            'S': ActionType.DODGE_PRESS,
-            's': ActionType.DODGE_RELEASE,
-            'C': ActionType.STRONG_PRESS,
-            'c': ActionType.STRONG_RELEASE,
-            'F': ActionType.STRONG_LEFT_PRESS,
-            'f': ActionType.STRONG_LEFT_RELEASE,
-            'G': ActionType.STRONG_RIGHT_PRESS,
-            'g': ActionType.STRONG_RIGHT_RELEASE,
-            'X': ActionType.STRONG_UP_PRESS,
-            'x': ActionType.STRONG_UP_RELEASE,
-            'W': ActionType.STRONG_DOWN_PRESS,
-            'w': ActionType.STRONG_DOWN_RELEASE,
-            0: ActionType.ANG_RIGHT,
-            45: ActionType.ANG_UP_RIGHT,
-            90: ActionType.ANG_UP,
-            135: ActionType.ANG_UP_LEFT,
-            180: ActionType.ANG_LEFT,
-            225: ActionType.ANG_DOWN_LEFT,
-            270: ActionType.ANG_DOWN,
-            315: ActionType.ANG_DOWN_RIGHT,
-            'Z': ActionType.ANG_TOGGLE_PRESS,
-            'z': ActionType.ANG_TOGGLE_RELEASE
-        }.get(x, ActionType.INVALID)
-
-    def map_simple(self):
-        return{
-            ActionType.LEFT_PRESS: SimpleAction.LEFT,
-            ActionType.LEFT_RELEASE: SimpleAction.LEFT,
-            ActionType.LEFT_TAP: SimpleAction.LEFT_TAP,
-            ActionType.RIGHT_PRESS: SimpleAction.RIGHT,
-            ActionType.RIGHT_RELEASE: SimpleAction.RIGHT,
-            ActionType.RIGHT_TAP: SimpleAction.RIGHT_TAP,
-            ActionType.UP_PRESS: SimpleAction.UP,
-            ActionType.UP_RELEASE: SimpleAction.UP,
-            ActionType.UP_TAP: SimpleAction.UP_TAP,
-            ActionType.DOWN_PRESS: SimpleAction.DOWN,
-            ActionType.DOWN_RELEASE: SimpleAction.DOWN,
-            ActionType.DOWN_TAP: SimpleAction.DOWN_TAP,
-            ActionType.ATTACK_PRESS: SimpleAction.ATTACK,
-            ActionType.ATTACK_RELEASE: SimpleAction.ATTACK,
-            ActionType.SPECIAL_PRESS: SimpleAction.SPECIAL,
-            ActionType.SPECIAL_RELEASE: SimpleAction.SPECIAL,
-            ActionType.JUMP_PRESS: SimpleAction.JUMP,
-            ActionType.JUMP_RELEASE: SimpleAction.JUMP,
-            ActionType.DODGE_PRESS: SimpleAction.DODGE,
-            ActionType.DODGE_RELEASE: SimpleAction.DODGE,
-            ActionType.STRONG_PRESS: SimpleAction.STRONG,
-            ActionType.STRONG_RELEASE: SimpleAction.STRONG,
-            ActionType.STRONG_LEFT_PRESS: SimpleAction.STRONG_LEFT,
-            ActionType.STRONG_LEFT_RELEASE: SimpleAction.STRONG_LEFT,
-            ActionType.STRONG_RIGHT_PRESS: SimpleAction.STRONG_RIGHT,
-            ActionType.STRONG_RIGHT_RELEASE: SimpleAction.STRONG_RIGHT,
-            ActionType.STRONG_UP_PRESS: SimpleAction.STRONG_UP,
-            ActionType.STRONG_UP_RELEASE: SimpleAction.STRONG_UP,
-            ActionType.STRONG_DOWN_PRESS: SimpleAction.STRONG_DOWN,
-            ActionType.STRONG_DOWN_RELEASE: SimpleAction.STRONG_DOWN,
-            ActionType.ANG_RIGHT: SimpleAction.ANG_RIGHT,
-            ActionType.ANG_UP_RIGHT: SimpleAction.ANG_UP_RIGHT,
-            ActionType.ANG_UP: SimpleAction.ANG_UP,
-            ActionType.ANG_UP_LEFT: SimpleAction.ANG_UP_LEFT,
-            ActionType.ANG_LEFT: SimpleAction.ANG_LEFT,
-            ActionType.ANG_DOWN_LEFT: SimpleAction.ANG_DOWN_LEFT,
-            ActionType.ANG_DOWN: SimpleAction.ANG_DOWN,
-            ActionType.ANG_DOWN_RIGHT: SimpleAction.ANG_DOWN_RIGHT,
-            ActionType.ANG_TOGGLE_PRESS: SimpleAction.ANG_TOGGLE,
-            ActionType.ANG_TOGGLE_RELEASE: SimpleAction.ANG_TOGGLE
-        }.get(self.type, SimpleAction.INVALID)
+        return ActionType.map_actions(simp_action)
 
     def get_ms_from_start(self):
         return (self.frame_index / 60.00) * 1000
@@ -302,8 +199,7 @@ def print_help():
     print("\t -help : prints the help info(this)\n---------------\n\n")
 
 
-if __name__ == "__main__":
-
+def main():
     passed_commands = []
     possible_commands = ["-d", "-f", "-o", "-npy", "-p", '-help']
     replays = []
@@ -384,3 +280,7 @@ if __name__ == "__main__":
     if(len(replays) > 0):
         print("Program finished!\nProcessed " +
               str(len(replays)) + " replays!")
+
+
+if __name__ == "__main__":
+    main()
